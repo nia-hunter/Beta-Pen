@@ -1,0 +1,12 @@
+/run/initialize
+
+/gps/particle ion
+/gps/ion 9 18 9
+/gps/pos/type Point
+#/gps/pos/shape point
+/gps/pos/centre 0. 0. 1. mm
+#/gps/pos/radius 17.5 mm
+#/gps/pos/halfz 1.56 mm
+/gps/ene/mono 0 MeV
+
+/run/beamOn 100
