@@ -303,7 +303,7 @@ G4Box* CookieCutter = new G4Box("Cutter", 6.016,6.016,15.016);
 //G4Tubs* EpoxyFill = new G4Tubs("Dummy", 0. *mm, 0.912*mm, 1.75*mm, 0*deg, 360*deg);
 G4SubtractionSolid* Turtle = new G4SubtractionSolid("Turtle", CookieCutter, Guide_box, 0, G4ThreeVector(0,0,0.017));
 G4LogicalVolume * Turtle_log = new G4LogicalVolume(Donatello, Al, "Turtle", 0,0,0);
-G4VPhysicalVolume * Turtle_phys = new G4PVPlacement(0,G4ThreeVector(0,0,0.3*mm), Turtle_log, "Turtle", expHall_log, false, 0);
+G4VPhysicalVolume * Turtle_phys = new G4PVPlacement(0,G4ThreeVector(0,0,15.3*mm), Turtle_log, "Turtle", expHall_log, false, 0);
 
 
 
