@@ -126,8 +126,10 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   G4Material* metal = man->FindOrBuildMaterial("G4_STAINLESS-STEEL"); 
 //
 // ------------ Generate & Add Material Properties Table ------------
-//
-  G4double photonEnergy[] =
+
+// Photon energies (to define refractive index at a given energy)
+ 
+G4double photonEnergy[] =
             { 2.034*eV, 2.068*eV, 2.103*eV, 2.139*eV,
               2.177*eV, 2.216*eV, 2.256*eV, 2.298*eV,
               2.341*eV, 2.386*eV, 2.433*eV, 2.481*eV,
@@ -136,142 +138,12 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
               3.026*eV, 3.102*eV, 3.181*eV, 3.265*eV,
               3.353*eV, 3.446*eV, 3.545*eV, 3.649*eV,
               3.760*eV, 3.877*eV, 4.002*eV, 4.136*eV };
-
+ 
   const G4int nEntries = sizeof(photonEnergy)/sizeof(G4double);
-
-//
-// Water
-// I used to have a water tank for the lund stuff and from my original water box
-  G4double refractiveIndex1[] =
-            { 1.3435, 1.344,  1.3445, 1.345,  1.3455,
-              1.346,  1.3465, 1.347,  1.3475, 1.348,
-              1.3485, 1.3492, 1.35,   1.3505, 1.351,
-              1.3518, 1.3522, 1.3530, 1.3535, 1.354,
-              1.3545, 1.355,  1.3555, 1.356,  1.3568,
-              1.3572, 1.358,  1.3585, 1.359,  1.3595,
-              1.36,   1.3608};
-
-  assert(sizeof(refractiveIndex1) == sizeof(photonEnergy));
-
-  G4double absorption[] =
-           {3.448*m,  4.082*m,  6.329*m,  9.174*m, 12.346*m, 13.889*m,
-           15.152*m, 17.241*m, 18.868*m, 20.000*m, 26.316*m, 35.714*m,
-           45.455*m, 47.619*m, 52.632*m, 52.632*m, 55.556*m, 52.632*m,
-           52.632*m, 47.619*m, 45.455*m, 41.667*m, 37.037*m, 33.333*m,
-           30.000*m, 28.500*m, 27.000*m, 24.500*m, 22.000*m, 19.500*m,
-           17.500*m, 14.500*m };
-
-  assert(sizeof(absorption) == sizeof(photonEnergy));
-
-  G4double scintilFast[] =
-            { 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00,
-              1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00,
-              1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00,
-              1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00,
-              1.00, 1.00, 1.00, 1.00 };
-
-  assert(sizeof(scintilFast) == sizeof(photonEnergy));
-
-  G4double scintilSlow[] =
-            { 0.01, 1.00, 2.00, 3.00, 4.00, 5.00, 6.00,
-              7.00, 8.00, 9.00, 8.00, 7.00, 6.00, 4.00,
-              3.00, 2.00, 1.00, 0.01, 1.00, 2.00, 3.00,
-              4.00, 5.00, 6.00, 7.00, 8.00, 9.00, 8.00,
-              7.00, 6.00, 5.00, 4.00 };
-
-  
-  
-assert(sizeof(scintilSlow) == sizeof(photonEnergy));
-
-  G4MaterialPropertiesTable* myMPT1 = new G4MaterialPropertiesTable();
-
-  myMPT1->AddProperty("RINDEX",       photonEnergy, refractiveIndex1,nEntries)
-    ->SetSpline(true);
-  //really important here is the SetSpline, Geant4 does not use spline interpolation
-  //as default, it uses just the values, which can be seen the the photon spectrum
-  //so just use this if you want to use a range of wavelengths
-  myMPT1->AddProperty("ABSLENGTH",    photonEnergy, absorption,     nEntries)
-        ->SetSpline(true);
-  myMPT1->AddProperty("FASTCOMPONENT",photonEnergy, scintilFast,     nEntries)
-        ->SetSpline(true);
-  myMPT1->AddProperty("SLOWCOMPONENT",photonEnergy, scintilSlow,     nEntries)
-        ->SetSpline(true);
-
-  myMPT1->AddConstProperty("SCINTILLATIONYIELD",50./MeV);
-  myMPT1->AddConstProperty("RESOLUTIONSCALE",1.0);
-  myMPT1->AddConstProperty("FASTTIMECONSTANT", 1.*ns);
-  myMPT1->AddConstProperty("SLOWTIMECONSTANT",1000.*ns);
-  myMPT1->AddConstProperty("YIELDRATIO",0.91);
-
-  G4double energy_water[] = {
-     1.56962*eV, 1.58974*eV, 1.61039*eV, 1.63157*eV,
-     1.65333*eV, 1.67567*eV, 1.69863*eV, 1.72222*eV,
-     1.74647*eV, 1.77142*eV, 1.7971 *eV, 1.82352*eV,
-     1.85074*eV, 1.87878*eV, 1.90769*eV, 1.93749*eV,
-     1.96825*eV, 1.99999*eV, 2.03278*eV, 2.06666*eV,
-     2.10169*eV, 2.13793*eV, 2.17543*eV, 2.21428*eV,
-     2.25454*eV, 2.29629*eV, 2.33962*eV, 2.38461*eV,
-     2.43137*eV, 2.47999*eV, 2.53061*eV, 2.58333*eV,
-     2.63829*eV, 2.69565*eV, 2.75555*eV, 2.81817*eV,
-     2.88371*eV, 2.95237*eV, 3.02438*eV, 3.09999*eV,
-     3.17948*eV, 3.26315*eV, 3.35134*eV, 3.44444*eV,
-     3.54285*eV, 3.64705*eV, 3.75757*eV, 3.87499*eV,
-     3.99999*eV, 4.13332*eV, 4.27585*eV, 4.42856*eV,
-     4.59258*eV, 4.76922*eV, 4.95999*eV, 5.16665*eV,
-     5.39129*eV, 5.63635*eV, 5.90475*eV, 6.19998*eV
-  };
-
-  const G4int numentries_water = sizeof(energy_water)/sizeof(G4double);
-
-  //assume 100 times larger than the rayleigh scattering for now.
-  //not really nessasary, just here because have all the data you need for water
-  //=D
-  G4double mie_water[] = {
-     167024.4*m, 158726.7*m, 150742  *m,
-     143062.5*m, 135680.2*m, 128587.4*m,
-     121776.3*m, 115239.5*m, 108969.5*m,
-     102958.8*m, 97200.35*m, 91686.86*m,
-     86411.33*m, 81366.79*m, 76546.42*m,
-     71943.46*m, 67551.29*m, 63363.36*m,
-     59373.25*m, 55574.61*m, 51961.24*m,
-     48527.00*m, 45265.87*m, 42171.94*m,
-     39239.39*m, 36462.50*m, 33835.68*m,
-     31353.41*m, 29010.30*m, 26801.03*m,
-     24720.42*m, 22763.36*m, 20924.88*m,
-     19200.07*m, 17584.16*m, 16072.45*m,
-     14660.38*m, 13343.46*m, 12117.33*m,
-     10977.70*m, 9920.416*m, 8941.407*m,
-     8036.711*m, 7202.470*m, 6434.927*m,
-     5730.429*m, 5085.425*m, 4496.467*m,
-     3960.210*m, 3473.413*m, 3032.937*m,
-     2635.746*m, 2278.907*m, 1959.588*m,
-     1675.064*m, 1422.710*m, 1200.004*m,
-     1004.528*m, 833.9666*m, 686.1063*m
-  };
-
-  assert(sizeof(mie_water) == sizeof(energy_water));
-
-  // gforward, gbackward, forward backward ratio
-  G4double mie_water_const[3]={0.99,0.99,0.8};
-
-  myMPT1->AddProperty("MIEHG",energy_water,mie_water,numentries_water)
-        ->SetSpline(true);
-  myMPT1->AddConstProperty("MIEHG_FORWARD",mie_water_const[0]);
-  myMPT1->AddConstProperty("MIEHG_BACKWARD",mie_water_const[1]);
-  myMPT1->AddConstProperty("MIEHG_FORWARD_RATIO",mie_water_const[2]);
-
-  G4cout << "Water G4MaterialPropertiesTable" << G4endl;
-  myMPT1->DumpTable();
-
-  water->SetMaterialPropertiesTable(myMPT1);
-
-  // Set the Birks Constant for the Water scintillator
-
-  water->GetIonisation()->SetBirksConstant(0.126*mm/MeV);
-
+ 
 //
 // Air
-//
+ 
   G4double refractiveIndex2[] =
             { 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00,
               1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00,
@@ -279,14 +151,14 @@ assert(sizeof(scintilSlow) == sizeof(photonEnergy));
               1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00,
               1.00, 1.00, 1.00, 1.00 };
 
-  G4MaterialPropertiesTable* myMPT2 = new G4MaterialPropertiesTable();
-  myMPT2->AddProperty("RINDEX", photonEnergy, refractiveIndex2, nEntries)
+  G4MaterialPropertiesTable* Air = new G4MaterialPropertiesTable();
+  Air->AddProperty("RINDEX", photonEnergy, refractiveIndex2, nEntries)
     ->SetSpline(true);
   //only adding R-index for air, its all it deservs
   G4cout << "Air G4MaterialPropertiesTable" << G4endl;
-  myMPT2->DumpTable();
+  Air->DumpTable();
   //can dump the tables, this writes it to the running file
-  air->SetMaterialPropertiesTable(myMPT2);
+  air->SetMaterialPropertiesTable(Air);
 
 //
 // Perspex
@@ -298,76 +170,15 @@ assert(sizeof(scintilSlow) == sizeof(photonEnergy));
               1.486, 1.486, 1.486, 1.486, 1.486, 1.486, 1.486,
               1.486, 1.486, 1.486, 1.486 };
 
-  G4MaterialPropertiesTable* myMPT3 = new G4MaterialPropertiesTable();
-  myMPT3->AddProperty("RINDEX", photonEnergy, refractiveIndex3, nEntries)->SetSpline(true);
+  G4MaterialPropertiesTable* Perspex = new G4MaterialPropertiesTable();
+  Perspex->AddProperty("RINDEX", photonEnergy, refractiveIndex3, nEntries)->SetSpline(true);
 
   G4cout << "PERRSPEX G4MaterialPropertiesTable" << G4endl;
-  myMPT3->DumpTable();
+  Perspex->DumpTable();
 
-  perspex->SetMaterialPropertiesTable(myMPT3);
-  SiPM_mat->SetMaterialPropertiesTable(myMPT3);
-  //set to perspex for now, not too far off, but had problems with old
-  //material, so just counting how many pass through, the R-index is
+  perspex->SetMaterialPropertiesTable(Perspex);
+  SiPM_mat->SetMaterialPropertiesTable(Perspex);
   //about right... I know, lazy right
-
-//
-// CLYC
-//
-    G4MaterialPropertiesTable* myMPT4 = new G4MaterialPropertiesTable();
-  G4double refractiveIndex4[] =
-            { 1.81, 1.81,  1.81, 1.81,  1.81,
-              1.81,  1.81, 1.81,  1.81, 1.81,
-              1.81, 1.81, 1.81,   1.81, 1.81,
-              1.81, 1.81, 1.81, 1.81, 1.81,
-              1.81, 1.81,  1.81, 1.81,  1.81,
-              1.81, 1.81,  1.81, 1.81,  1.81,
-              1.81,   1.81};
-
-  assert(sizeof(refractiveIndex4) == sizeof(photonEnergy));
-
-
-  G4double scintilFast4[] =
-            { 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00,
-              1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00,
-              1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00,
-              1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00,
-              1.00, 1.00, 1.00, 1.00 };
-
-  assert(sizeof(scintilFast4) == sizeof(photonEnergy));
-
-  /*  G4double scintilSlow4[] =
-            { 0.01, 1.00, 2.00, 3.00, 4.00, 5.00, 6.00,
-              7.00, 8.00, 9.00, 8.00, 7.00, 6.00, 4.00,
-              3.00, 2.00, 1.00, 0.01, 1.00, 2.00, 3.00,
-              4.00, 5.00, 6.00, 7.00, 8.00, 9.00, 8.00,
-              7.00, 6.00, 5.00, 4.00 };
-  */
-  
-  G4double scintilSlow4[] =
-            { 1., 1., 1., 1., 1., 1., 1.,
-              1., 1., 1., 1., 1., 1., 1.,
-              1., 1., 1., 1., 1., 1., 1.,
-              1., 1., 1., 1., 1., 1., 1.,
-              1., 1., 1., 1. };
-  assert(sizeof(scintilSlow4) == sizeof(photonEnergy));
-
-  //G4MaterialPropertiesTable* myMPT4 = new G4MaterialPropertiesTable();
-
-  myMPT4->AddProperty("RINDEX",       photonEnergy, refractiveIndex4,nEntries)
-        ->SetSpline(true);
-  myMPT4->AddProperty("FASTCOMPONENT",photonEnergy, scintilFast4,     nEntries)
-        ->SetSpline(true);
-  myMPT4->AddProperty("SLOWCOMPONENT",photonEnergy, scintilSlow4,     nEntries)
-        ->SetSpline(true);
-
-  myMPT4->AddConstProperty("SCINTILLATIONYIELD",20000./MeV);
-  myMPT4->AddConstProperty("RESOLUTIONSCALE",1.0);
-  myMPT4->AddConstProperty("FASTTIMECONSTANT", 50.*ns);
-  myMPT4->AddConstProperty("SLOWTIMECONSTANT",1000.*ns);
-  myMPT4->AddConstProperty("YIELDRATIO",0.91);
-  CLYC->SetMaterialPropertiesTable(myMPT4);
-  //remember to change back to CLYC times 1ns and 1000ns and 20000/Mev
-
 
 // GAGG
 //
@@ -445,20 +256,8 @@ assert(sizeof(scintilSlow) == sizeof(photonEnergy));
   expHall_phys
   = new G4PVPlacement(0,G4ThreeVector(),expHall_log,"World",0,false,0);
     expHall_log->SetVisAttributes(G4VisAttributes::Invisible);
-
-//Al casing
-//
-    G4double r_case_in[5] = {0*mm,27.25*mm,27.25*mm,27.25*mm,27.25*mm};
-    G4double r_case_out[5] = {28.5*mm,28.5*mm,28.5*mm,38.1*mm,38.1*mm};
-    G4double h_case[5] = {0*mm,0.8*mm,47.79*mm,47.8*mm,56.3*mm};
-    G4Polycone* case_box = new G4Polycone("Casing",0,360*deg,5,h_case,r_case_in,r_case_out);
-    G4LogicalVolume* case_log = new G4LogicalVolume(case_box,Al,"casing",0,0,0);
-    //  G4VPhysicalVolume* case_phys = new G4PVPlacement(0,G4ThreeVector(0,0,-62*mm),case_log,"casing",expHall_log,false,0);
-
-    //I have left in old geometry but it is not physically placed, so doesn't matter
-    // TBH, this will increase memory usage by a few kB
     
-// The Light Guide
+// The Scintillator
 //
     G4double r1[6] = {0*mm,5*mm,10*mm,15*mm,20*mm,24.01*mm};
     G4double r2[6] = {0,0,0,0,0,0};
@@ -470,16 +269,16 @@ assert(sizeof(scintilSlow) == sizeof(photonEnergy));
     G4double outerd[2] = {1.5*mm, 0.15*mm};
     G4double wrapin[2] = {1.51*mm, 0.16*mm};
     G4double wrapout[2] = {1.56*mm, 0.21*mm};
-    // G4Cons* Guide_box = new G4Cons("Guide",0*mm,25.5*mm,0*mm,25.4/2*mm,30*mm,0*deg,360*deg);
-    G4Polycone* Guide_box = new G4Polycone("Guide",0,360*deg,2,zpos,innerd,outerd);
 
+    // Cylinder
+    // G4Cons* Guide_box = new G4Cons("Guide",0*mm,25.5*mm,0*mm,25.4/2*mm,30*mm,0*deg,360*deg);
+    // Cuboid
+    //  G4Box* Guide_box=new G4Box("Guide",0.3,0.3,1.75);
+    // Cone
+    G4Polycone* Guide_box = new G4Polycone("Guide",0,360*deg,2,zpos,innerd,outerd);
     G4Polycone* Eminem = new G4Polycone("Tupac",0,360*deg,2,zpos,wrapin,wrapout);
 
-    //made the light guide box into the scintillator
-    //this is just for speed to coding, the names mean nothing
-    // that comes later, I should clean this up
-    // but this is a work in progress offshoot
-  //  G4Box* Guide_box=new G4Box("Guide",0.3,0.3,1.75);
+  // Setting Materials for the scintillator and the scintillator cover (Guide_log = scintillator, Snooop = Al coating) 
   G4LogicalVolume* Guide_log
     = new G4LogicalVolume(Guide_box,GAGG,"Guide",0,0,0);
  
@@ -489,62 +288,15 @@ assert(sizeof(scintilSlow) == sizeof(photonEnergy));
    G4VisAttributes* boxVisAtt = new G4VisAttributes(G4Colour(1.0,.43,0.0));
    Guide_log->SetVisAttributes(boxVisAtt);
 
- // G4VPhysicalVolume* Guide_phys 
-   //  = new G4PVPlacement(0,G4ThreeVector(0,0,-5.7*mm),Guide_log,"Guide",
-     //               expHall_log,false,0);
-//Guide Wrap
-//
-//G4Cons* Guide_Wrap = new G4Cons("Guide_Wrap",25.5*mm,25.8*mm,25.4/2*mm,25.8/2*mm,30*mm,0*deg,360*deg);
-    G4Polycone* Guide_Wrap = new G4Polycone("Guide_Wrap",0,360*deg,6,r1,r3,r4);
-
- // G4LogicalVolume* Guide_Wrap_log
-  //  = new G4LogicalVolume(Guide_Wrap,perspex,"Guide_Wrap",0,0,0);
-
-  // G4VPhysicalVolume* Guide_Wrap_phys
-  // Guide_Wrap_phys
-  //= new G4PVPlacement(0,G4ThreeVector(0,0,-5.7*mm),Guide_Wrap_log,"Guide_Wrap",
-  //    expHall_log,false,0);
-    
-
- G4Tubs* Window_tub = new G4Tubs("window", 0*mm,27.25*mm, 1.5*mm,0*deg,360*deg); 
-
-G4LogicalVolume* Window_log = new G4LogicalVolume(Window_tub,perspex,"window",0,0,0);
-// The Scintillator
-//
- // G4Tubs* Scint_box = new G4Tubs("Scint",0.686*mm,0.9145*mm,1.75*mm,0.*deg,360.*deg);
-
- // G4LogicalVolume* Scint_log
- //   = new G4LogicalVolume(Scint_box,CLYC,"Scint",0,0,0);
-//G4VPhysicalVolume* Guide_phys =
-      fScint = new G4PVPlacement(0,G4ThreeVector(0,0,0.3*mm),Guide_log,"Guide",
+   fScint = new G4PVPlacement(0,G4ThreeVector(0,0,0.3*mm),Guide_log,"Guide",
                         expHall_log,false,0);
 
 G4VPhysicalVolume * Nelly = 
       new G4PVPlacement(0,G4ThreeVector(0,0,0.3*mm),Snoop,"Tupac", expHall_log,false,0);
 
-      //Using the Guide_log for the scintillator
-      //I read for fScint, this is a throwback to
-      //the older modular way, so anything
-      //can be defined as fScint
-      
-// Scintillator Wrapper
-  G4Tubs* Scint_Wrap = new G4Tubs("Scint_Wrap",0.686*mm, 0.9145*mm,1.75*mm,0*deg,360*deg);
- // G4LogicalVolume* Scint_Wrap_log
-   //    = new G4LogicalVolume(Scint_Wrap,Al,"Scint_Wrap",0,0,0);
-//  G4VPhysicalVolume* Scint_Wrap_phys =
-//  new G4PVPlacement(0,G4ThreeVector(0,0,1.75*mm),Scint_Wrap_log,"Scint_Wrap",
-  //                    expHall_log,false,0);
-//  G4Tubs* Scint_Wrap_2 = new G4Tubs("Scint_Wrap_2",0, 25.5*mm,0.4*mm,0*deg,360*deg);
-//  G4LogicalVolume* Scint_Wrap_2_log
- //   = new G4LogicalVolume(Scint_Wrap_2,wrapping,"Scint_Wrap_2",0,0,0);
-  //G4VPhysicalVolume* Scint_Wrap_2_phys =
-    // new G4PVPlacement(0,G4ThreeVector(0,0,-60.0*mm),Scint_Wrap_2_log,"Scint_Wrap_2",
-    //                expHall_log,false,0);
-  //G4Tubs* Window_tub = new G4Tubs("window", 0*mm,27.25*mm, 1.5*mm,0*deg,360*deg); 
-//G4LogicalVolume* Window_log = new G4LogicalVolume(Window_tub,perspex,"window",0,0,0);
-//G4VPhysicalVolume* Window_Pys =new G4PVPlacement(0,G4ThreeVector(0,0,-7*mm),Window_log,"window",expHall_log,false,0);
-
-
+ 
+// Makes a smaller volume inside the larger volume so you can wrap a tube, or whatever.
+ 
 //G4Box* CookieCutter = new G4Box("Cutter", 0.31,0.31,1.76);
 //G4Tubs* EpoxyFill = new G4Tubs("Dummy", 0. *mm, 0.912*mm, 1.75*mm, 0*deg, 360*deg);
 //G4SubtractionSolid* SpaceFiller = new G4SubtractionSolid("EpoxyFiller", EpoxyFill, CookieCutter, 0, G4ThreeVector(0,0,0));
@@ -558,7 +310,6 @@ G4VPhysicalVolume * Nelly =
 //SiPM object, only the optical part for now, rest plays havok with array
  G4Box* SiPM_box = new G4Box("SiPM", SiPM_pitch,SiPM_pitch, 0.3*mm);
  SiPM_log = new G4LogicalVolume(SiPM_box, SiPM_mat, "SiPM",0,0,0);
- //fSiPM = new G4PVPlacement(0,G4ThreeVector(0,0,2.5), SiPM_log,"SiPM", expHall_log,false,0);
  //now to make an array, the nxm matrix values should be at the top of this as SiPM_n and m
  if(SiPM_n==1&&SiPM_m==1){
 fSiPM = new G4PVPlacement(0,G4ThreeVector(0,0,0), SiPM_log,"SiPM", expHall_log,false,0);
@@ -567,7 +318,6 @@ fSiPM = new G4PVPlacement(0,G4ThreeVector(0,0,0), SiPM_log,"SiPM", expHall_log,f
  G4double iter_x;
  G4double iter_y;
  int cpy_n; 
- // G4double SiPM_sep = 0.05;
  for(int i = 0; i<SiPM_n;i++){
    for(int j = 0; j<SiPM_n;j++){
      iter_x = 2*i*(SiPM_pitch+SiPM_sep)*mm - (SiPM_n-1)*(SiPM_pitch+SiPM_sep);
