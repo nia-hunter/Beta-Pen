@@ -272,36 +272,38 @@ G4double photonEnergy[] =
 
     // Cylinder
     // G4Cons* Guide_box = new G4Cons("Guide",0*mm,25.5*mm,0*mm,25.4/2*mm,30*mm,0*deg,360*deg);
-    // Cuboid
-    //  G4Box* Guide_box=new G4Box("Guide",0.3,0.3,1.75);
+    // Cuboid - 12x12x30mm for Beth's experiment
+    G4Box* Guide_box=new G4Box("Guide",6,6,15);
     // Cone
-    G4Polycone* Guide_box = new G4Polycone("Guide",0,360*deg,2,zpos,innerd,outerd);
-    G4Polycone* Eminem = new G4Polycone("Tupac",0,360*deg,2,zpos,wrapin,wrapout);
+    // G4Polycone* Guide_box = new G4Polycone("Guide",0,360*deg,2,zpos,innerd,outerd);
+    // G4Polycone* Eminem = new G4Polycone("Tupac",0,360*deg,2,zpos,wrapin,wrapout);
 
   // Setting Materials for the scintillator and the scintillator cover (Guide_log = scintillator, Snooop = Al coating) 
   G4LogicalVolume* Guide_log
     = new G4LogicalVolume(Guide_box,GAGG,"Guide",0,0,0);
  
-  G4LogicalVolume* Snoop 
-    = new G4LogicalVolume(Eminem,Al,"Tupac",0,0,0);
+ 
+  //G4LogicalVolume* Snoop 
+   // = new G4LogicalVolume(Eminem,Al,"Tupac",0,0,0);
 
+   // Setting scintillator colour to orange (just for funsies really)
    G4VisAttributes* boxVisAtt = new G4VisAttributes(G4Colour(1.0,.43,0.0));
    Guide_log->SetVisAttributes(boxVisAtt);
 
    fScint = new G4PVPlacement(0,G4ThreeVector(0,0,0.3*mm),Guide_log,"Guide",
                         expHall_log,false,0);
 
-G4VPhysicalVolume * Nelly = 
-      new G4PVPlacement(0,G4ThreeVector(0,0,0.3*mm),Snoop,"Tupac", expHall_log,false,0);
+//G4VPhysicalVolume * Nelly = 
+     // new G4PVPlacement(0,G4ThreeVector(0,0,0.3*mm),Snoop,"Tupac", expHall_log,false,0);
 
  
-// Makes a smaller volume inside the larger volume so you can wrap a tube, or whatever.
+// Makes a smaller volume inside the larger volume so you can wrap the scintillator, or whatever.
  
-//G4Box* CookieCutter = new G4Box("Cutter", 0.31,0.31,1.76);
+G4Box* CookieCutter = new G4Box("Cutter", 6.016,6.016,15.016);
 //G4Tubs* EpoxyFill = new G4Tubs("Dummy", 0. *mm, 0.912*mm, 1.75*mm, 0*deg, 360*deg);
-//G4SubtractionSolid* SpaceFiller = new G4SubtractionSolid("EpoxyFiller", EpoxyFill, CookieCutter, 0, G4ThreeVector(0,0,0));
-//G4LogicalVolume * Filler_log = new G4LogicalVolume(SpaceFiller, Epoxy, "EpoxyFiller", 0,0,0);
-//G4VPhysicalVolume * Filler_phys = new G4PVPlacement(0,G4ThreeVector(0,0,1.75*mm), Filler_log, "EpoxyFiller", expHall_log, false, 0);
+G4SubtractionSolid* Turtle = new G4SubtractionSolid("Turtle", CookieCutter, Guide_box, 0, G4ThreeVector(0,0,0.017));
+G4LogicalVolume * Turtle_log = new G4LogicalVolume(Donatello, Al, "Turtle", 0,0,0);
+G4VPhysicalVolume * Turtle_phys = new G4PVPlacement(0,G4ThreeVector(0,0,0.3*mm), Turtle_log, "Turtle", expHall_log, false, 0);
 
 
 
